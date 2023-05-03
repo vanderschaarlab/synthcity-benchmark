@@ -29,14 +29,9 @@ def run_open_ml(data_type='num', task_type='regression'):
     data_id = get_data_id(data_type, task_type)
 
     task_df_filtered = task_df[task_df.did.isin(data_id)]
-    # print(task_df_filtered.shape)
-    # print(task_df_filtered.head())
 
     # group by did and take first tid
     task_df_filtered = task_df_filtered.groupby('did').first().reset_index()
-    # print(task_df_filtered.shape)
-    # print(len(data_id))
-    print(task_df_filtered.head())
 
     # for each row in task_df_filtered, get the task and the data
     for index, row in task_df_filtered.iterrows():
@@ -45,6 +40,8 @@ def run_open_ml(data_type='num', task_type='regression'):
         task = tasks.get_task(tid)
         X, y = task.get_X_and_y(dataset_format='dataframe')
         data_dict = {'X': X, 'y': y, 'tid': tid, 'did': did}
+
+        print(data_dict)
 
         with open(f'./data/{data_type}/{task_type}/{did}.pkl', 'wb') as f:
             pickle.dump(data_dict, f)

@@ -9,8 +9,6 @@ import synthcity.logger as log
 
 log.add("synthcity", "DEBUG")
 
-# MODELS = ["goggle", "ddpm", "tvae", "ctgan"]
-MODELS = ["ddpm"]
 KWARGS = {
     "n_iter": 100,
     # "batch_size": 100,
@@ -48,34 +46,24 @@ def run_dataset(X, workspace_path, model, task_type="regression"):
     return score
 
 
-def run_synthcity(data_type="num", task_type="regression"):
+def run_synthcity(data_type="num", task_type="regression", model="ctgan"):
     file_path = f"./data/{data_type}/{task_type}/"
     workspace_path = Path(f"./workspace/{data_type}/{task_type}/")
     result_path = f"./results/{data_type}/{task_type}/"
     Path(result_path).mkdir(parents=True, exist_ok=True)
+    file = "201.pkl"
 
-    # list files in the file_path
-    files = os.listdir(file_path)
-    print(f"Number of files in {file_path}: {len(files)}")
+    with open(f"{file_path}/{file}", "rb") as f:
+        data_dict = pickle.load(f)
 
-    for model in MODELS:
-        for file in files:
-            print(f"{file_path}/{file}")
-            with open(f"{file_path}/{file}", "rb") as f:
-                data_dict = pickle.load(f)
-
-            X = data_dict["X"]
-            y = data_dict["y"]
-            X["y"] = y
-            if "{result_path}/{file}-{model}-{KWARGS_str}.pkl" in os.listdir(
-                result_path
-            ):
-                print(f"{result_path}/{file}-{model}-{KWARGS_str}.pkl already exists")
-                continue
-            score = run_dataset(X, workspace_path, model, task_type=task_type)
-            if score:
-                with open(f"{result_path}/{file}-{model}-{KWARGS_str}.pkl", "wb") as f:
-                    pickle.dump(score, f)
+    X = data_dict["X"]
+    y = data_dict["y"]
+    X["y"] = y
+    if not "{result_path}/{file}-{model}-{KWARGS_str}.pkl" in os.listdir(result_path):
+        score = run_dataset(X, workspace_path, model, task_type=task_type)
+        if score:
+            with open(f"{result_path}/{file}-{model}-{KWARGS_str}.pkl", "wb") as f:
+                pickle.dump(score, f)
 
 
 if __name__ == "__main__":
@@ -87,6 +75,12 @@ if __name__ == "__main__":
         default="regression",
         choices=["regression", "classification"],
     )
+    parser.add_argument(
+        "--model",
+        type=str,
+        default="ctgan",
+        choices=["ctgan", "ddpm", "tvae", "goggle"],
+    )
 
     args = parser.parse_args()
-    run_synthcity(args.data_type, args.task_type)
+    run_synthcity(args.data_type, args.task_type, args.model)
