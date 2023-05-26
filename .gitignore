@@ -139,3 +139,6 @@ results-null/
 
 # workspace
 workspace/
+
+# config
+*.yml

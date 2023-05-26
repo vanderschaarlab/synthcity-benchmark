@@ -7,9 +7,9 @@ from synthcity.plugins.core.dataloader import GenericDataLoader
 from synthcity.benchmark import Benchmarks
 import synthcity.logger as log
 
-log.add("synthcity", "DEBUG")
+# log.add("synthcity", "DEBUG")
 
-KWARGS = {}
+KWARGS = {"n_iter": 100}
 KWARGS_str = "-".join([f"{k}:{v}" for k, v in KWARGS.items()])
 
 
@@ -42,7 +42,7 @@ def run_dataset(X, workspace_path, model, task_type="regression"):
 def run_synthcity(data_type="num", task_type="regression", model="ctgan"):
     file_path = f"./data/{data_type}/{task_type}/"
     workspace_path = Path(f"./workspace/{data_type}/{task_type}/")
-    result_path = f"./results/{data_type}/{task_type}/"
+    result_path = f"./results/{data_type}/{task_type}/{model}"
     Path(result_path).mkdir(parents=True, exist_ok=True)
 
     # list files in the file_path
@@ -57,9 +57,7 @@ def run_synthcity(data_type="num", task_type="regression", model="ctgan"):
         X = data_dict["X"]
         y = data_dict["y"]
         X["y"] = y
-        if "{result_path}/{file}-{model}-{KWARGS_str}.pkl" in os.listdir(result_path):
-            print(f"{result_path}/{file}-{model}-{KWARGS_str}.pkl already exists")
-            continue
+
         score = run_dataset(X, workspace_path, model, task_type=task_type)
         if score:
             with open(f"{result_path}/{file}-{model}-{KWARGS_str}.pkl", "wb") as f:
