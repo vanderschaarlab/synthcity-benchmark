@@ -38,7 +38,7 @@ def run_dataset(X, workspace_path, model, task_type="regression"):
         )
     except Exception as e:
         print("\n\n", e)
-        print(workspace_path, model, task_type, KWARGS)
+        print(model, task_type, KWARGS)
         score = None
 
     return score
@@ -49,39 +49,62 @@ def run_synthcity():
     task_types = ["regression", "classification"]
     model = "goggle"
 
-    for data_type in data_types:
-        print(f"Running {data_type} files:")
-        for task_type in task_types:
-            print(f"Running {task_type} files:")
-            file_path = f"./data/{data_type}/{task_type}/"
-            result_path = f"./results/{data_type}/{task_type}/"
-            # list files in the file_path
-            files = os.listdir(file_path)
-            for file in files:
-                completed_file_data = [
-                    (f.split("-")[0].split(".")[0], f.split("-")[1])
-                    for f in os.listdir(f"{result_path}/{model}/")
-                ]
-                file_num = file.split(".")[0]
-                if (file_num, model) not in completed_file_data:
-                    print(f"Running {file}-{model}")
-                    with open(f"{file_path}/{file}", "rb") as f:
-                        data_dict = pickle.load(f)
+    # list files in the file_path
+    files = [
+        "./data/num/regression//42729.pkl",
+        "./data/num/regression//43174.pkl",
+        "./data/num/regression//300.pkl",
+        "./data/num/classification//993.pkl",
+        "./data/num/classification//293.pkl",
+        "./data/num/classification//41150.pkl",
+        "./data/num/classification//42769.pkl",
+        "./data/num/classification//1461.pkl",
+        "./data/num/classification//354.pkl",
+        "./data/cat/regression//42712.pkl",
+        "./data/cat/regression//42207.pkl",
+        "./data/cat/regression//42571.pkl",
+        "./data/cat/regression//42729.pkl",
+        "./data/cat/regression//42225.pkl",
+        "./data/cat/regression//41540.pkl",
+        "./data/cat/regression//43144.pkl",
+        "./data/cat/regression//416.pkl",
+        "./data/cat/regression//6331.pkl",
+        "./data/cat/regression//42731.pkl",
+        "./data/cat/regression//42688.pkl",
+        "./data/cat/regression//42570.pkl",
+        "./data/cat/classification//1596.pkl",
+        "./data/cat/classification//1114.pkl",
+        "./data/cat/classification//41160.pkl",
+    ]
+    areas = []
+    for file in files:
+        with open(f"{file}", "rb") as f:
+            data_dict = pickle.load(f)
 
-                    X = data_dict["X"]
-                    y = data_dict["y"]
-                    X["y"] = y
+        X = data_dict["X"]
+        y = data_dict["y"]
+        X["y"] = y
 
-                    if X.isnull().values.any():
-                        X.replace(np.NaN, X.median(numeric_only=True), inplace=True)
+        areas.append(X.shape[0] * X.shape[1])
+    files_2_sort = list(zip(files, areas))
+    sorted_files = sorted(files_2_sort, key=lambda x: x[1])
 
-                    score = run_dataset(X, "workspace", model, task_type=task_type)
-                    if score:
-                        with open(
-                            f"{result_path}/{file}-{model}-{KWARGS_str}.pkl",
-                            "wb",
-                        ) as f:
-                            pickle.dump(score, f)
+    for file_t in sorted_files:
+        file = file_t[0]
+        print(f"Running {file}")
+        task_type = file.split("/")[3]
+        data_type = file.split("/")[2]
+        result_path = f"./results/{data_type}/{task_type}/{model}"
+        if X.isnull().values.any():
+            X.replace(np.NaN, X.median(numeric_only=True), inplace=True)
+
+        score = run_dataset(X, "workspace", model, task_type=task_type)
+        if score:
+            with open(
+                f"{result_path}/{file}-{model}-{KWARGS_str}.pkl",
+                "wb",
+            ) as f:
+                pickle.dump(score, f)
 
 
 if __name__ == "__main__":
