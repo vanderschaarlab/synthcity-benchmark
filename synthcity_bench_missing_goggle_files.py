@@ -97,7 +97,10 @@ def run_synthcity():
         result_path = f"./results/{data_type}/{task_type}/{model}"
         if X.isnull().values.any():
             X.replace(np.NaN, X.median(numeric_only=True), inplace=True)
-
+        results_file = file.split("/")[-1].split(".")[0]
+        print(
+            f"{result_path}/{results_file}-{model}-{KWARGS_str}.pkl",
+        )
         score = run_dataset(X, "workspace", model, task_type=task_type)
         if score:
             with open(
