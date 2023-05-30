@@ -98,13 +98,10 @@ def run_synthcity():
         if X.isnull().values.any():
             X.replace(np.NaN, X.median(numeric_only=True), inplace=True)
         results_file = file.split("/")[-1].split(".")[0]
-        print(
-            f"{result_path}/{results_file}-{model}-{KWARGS_str}.pkl",
-        )
         score = run_dataset(X, "workspace", model, task_type=task_type)
         if score:
             with open(
-                f"{result_path}/{file}-{model}-{KWARGS_str}.pkl",
+                f"{result_path}/{results_file}-{model}-{KWARGS_str}.pkl",
                 "wb",
             ) as f:
                 pickle.dump(score, f)
