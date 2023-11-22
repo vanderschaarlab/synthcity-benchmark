@@ -15,7 +15,7 @@ KWARGS = {"n_iter": 100}
 KWARGS_str = "-".join([f"{k}:{v}" for k, v in KWARGS.items()])
 
 
-def generate_data(X, delta=0.5):
+def generate_data(X, delta=0):
     try:
         # Train the ARF
         my_arf = arf.arf(x=X, delta=delta)
@@ -105,7 +105,7 @@ if __name__ == "__main__":
     parser.add_argument(
         "--delta",
         type=float,
-        default=0.5,
+        default=0,
         choices=[0.5, 0.4, 0.3, 0.2, 0.1, 0.05, 0],
     )
 

@@ -9,8 +9,8 @@ import synthcity.logger as log
 
 log.add("synthcity", "DEBUG")
 
-# MODELS = ["goggle", "ddpm", "tvae", "ctgan"]
-MODELS = ["ddpm"]
+MODELS = ["goggle", "ddpm", "tvae", "ctgan"]
+
 KWARGS = {
     "n_iter": 100,
     # "batch_size": 100,
